@@ -17,14 +17,43 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $sql = "INSERT INTO transaction_finance (amount, transaction_code, account_type, transaction_date) 
-            SELECT amount, transaction_code, transaction_type AS account_type, date_created AS transaction_date FROM transaction_donation
+    // Remove deleted data from transaction_finance
+    $deleteSql = "DELETE tf FROM transaction_finance tf
+                  LEFT JOIN transaction_donation td ON tf.transaction_code = td.transaction_code
+                  LEFT JOIN transaction_contribution tc ON tf.transaction_code = tc.transaction_code
+                  LEFT JOIN transaction_expenses te ON tf.transaction_code = te.transaction_code
+                  LEFT JOIN transaction_payment tp ON tf.transaction_code = tp.transaction_code
+                  WHERE td.transaction_code IS NULL
+                    AND tc.transaction_code IS NULL
+                    AND te.transaction_code IS NULL
+                    AND tp.transaction_code IS NULL";
+
+    $deleteResult = $conn->query($deleteSql);
+
+    if ($deleteResult === false) {
+        die("Error executing the query: " . $conn->error);
+    }
+
+    $sql = "INSERT INTO transaction_finance (amount, transaction_code, account_type, transaction_date, date_created) 
+            SELECT amount, transaction_code, transaction_type, date_created, date_created FROM transaction_donation
+            WHERE NOT EXISTS (
+                SELECT 1 FROM transaction_finance WHERE transaction_code = transaction_donation.transaction_code
+            )
             UNION ALL
-            SELECT amount, transaction_code, transaction_type AS account_type, date_created AS transaction_date  FROM transaction_contribution
+            SELECT amount, transaction_code, transaction_type, date_created, date_created FROM transaction_contribution
+            WHERE NOT EXISTS (
+                SELECT 1 FROM transaction_finance WHERE transaction_code = transaction_contribution.transaction_code
+            )
             UNION ALL
-            SELECT amount, transaction_code, transaction_type AS account_type, date_created AS transaction_date  FROM transaction_expenses
+            SELECT amount, transaction_code, transaction_type, date_created, date_created FROM transaction_expenses
+            WHERE NOT EXISTS (
+                SELECT 1 FROM transaction_finance WHERE transaction_code = transaction_expenses.transaction_code
+            )
             UNION ALL
-            SELECT amount, transaction_code, transaction_type AS account_type, date_created AS transaction_date  FROM transaction_payment";
+            SELECT amount, transaction_code, transaction_type, date_created, date_created FROM transaction_payment
+            WHERE NOT EXISTS (
+                SELECT 1 FROM transaction_finance WHERE transaction_code = transaction_payment.transaction_code
+            )";
 
     $result = $conn->query($sql);
 

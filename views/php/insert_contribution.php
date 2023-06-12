@@ -3,7 +3,7 @@
 include 'db_conn.php';
 
 // Retrieve form data
-$donor = $_POST['donor'];
+$body = $_POST['body_no'];
 $for_date = $_POST['date'];
 $amount = $_POST['amount'];
 
@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Insert data into database
-$sql = "INSERT INTO `transaction_contribution` (body_no, amount, for_date) VALUES ('$donor', '$amount', '$for_date')";
+$sql = "INSERT INTO `transaction_contribution` (body_no, amount, for_date) VALUES ('$body', '$amount', '$for_date')";
 
 if ($conn->query($sql) === TRUE) {
     // Get the auto-incrementing ID of the inserted row
