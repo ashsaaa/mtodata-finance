@@ -6,12 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance</title>
+    <link href="../../assets/css/finance.css" rel="stylesheet"/>
 </head>
 
 <body>
     <?php
     include 'db_conn.php';
-
     // Check connection
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
@@ -81,6 +81,9 @@
                     <th>Account Type</th>
                     <th>Amount</th>
                     <th>Transaction Date</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Balance</th>
                     <th>Date Created</th>
                     <th>Username</th>
                 </tr>
@@ -88,6 +91,7 @@
             <tbody>";
 
         while ($row = $selectResult->fetch_assoc()) {
+
             echo "
             <tr>
                 <td>" . $row["ID"] . "</td>
@@ -95,6 +99,9 @@
                 <td>" . $row["account_type"] . "</td>
                 <td>" . $row["amount"] . "</td>
                 <td>" . $row["transaction_date"] . "</td>
+                <td>" . $row["debit"] . "</td>
+                <td>" . $row["credit"] . "</td>
+                <td></td>
                 <td>" . $row["date_created"] . "</td>
                 <td>" . $row["user_name"] . "</td>
             </tr>";

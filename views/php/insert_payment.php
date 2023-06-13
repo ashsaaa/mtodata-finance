@@ -17,7 +17,7 @@ $dateToday = date('mdy');
 $transactionCode = '';
 $trantype = '';
 
-if ($type === 'REN') {
+if ($type === 'RNW') {
     $trantype = 'Renewal';
     $sql = "INSERT INTO transaction_payment (member_id, amount, transaction_code, transaction_type) VALUES ('$memberId', '$amount', '', '$trantype')";
 } elseif ($type === 'NEW') {
@@ -37,8 +37,8 @@ if ($conn->query($sql) === TRUE) {
     $incrementingNumber = str_pad($lastInsertedId, 3, '0', STR_PAD_LEFT);
     
     // Generate the transaction code based on the account type
-    if ($type === 'REN') {
-        $transactionCode = "REN{$dateToday}{$incrementingNumber}";
+    if ($type === 'RNW') {
+        $transactionCode = "RNW{$dateToday}{$incrementingNumber}";
     } elseif ($type === 'NEW') {
         $transactionCode = "NEW{$dateToday}{$incrementingNumber}";
     }
